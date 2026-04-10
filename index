@@ -1304,8 +1304,11 @@ function populateRegions(){
 
 // TAB COUNTS
 function updateCounts(){
-  document.getElementById('cnt-procurement').textContent=allProcurement.length||'0';
-  document.getElementById('cnt-land').textContent=allLand.length||'0';
+  // procurement and land tabs removed - only update directory and projects
+  const cd = document.getElementById('cnt-directory');
+  if(cd) cd.textContent = DIR_DATA.length;
+  const cp = document.getElementById('cnt-projects');
+  if(cp) cp.textContent = LIVE_PROJECTS.length;
 }
 
 
@@ -1424,8 +1427,8 @@ function getDirItems() {
     const q = searchTerm.toLowerCase();
     items = items.filter(c => {
       const hay = [c.name, c.description || '', ...(c.tags||[]),
-        ...c.projects.map(p => p.name + ' ' + p.location + ' ' + (p.description||'')),
-        ...c.collaborators].join(' ').toLowerCase();
+        ...(c.projects||[]).map(p => p.name + ' ' + p.location + ' ' + (p.description||'')),
+        ...(c.collaborators||[])].join(' ').toLowerCase();
       return hay.includes(q);
     });
   }
@@ -1525,7 +1528,7 @@ function renderDirectory() {
       </div>
       ${c.region && c.region !== 'UK-wide' ? `<div class="dtile-region">${escHtml(c.region)}</div>` : ''}
       ${tags ? `<div class="dtile-tags">${tags}</div>` : ''}
-      <div class="dtile-footer">${c.projects.length} project${c.projects.length !== 1 ? 's' : ''} \u00b7 click to explore</div>
+      <div class="dtile-footer">${(c.projects||[]).length} project${c.projects.length !== 1 ? 's' : ''} \u00b7 click to explore</div>
     </div>`;
   }).join('');
 }
@@ -1569,7 +1572,7 @@ function openDirPanel(name) {
     </div>
     ${c.description ? `<div class="dp-desc">${escHtml(c.description)}</div>` : ''}
     ${(c.tags||[]).length ? `<div class="dp-tags">${(c.tags||[]).map(t=>`<span class="dp-tag">${escHtml(t)}</span>`).join('')}</div>` : ''}
-    ${c.projects.length ? `<div class="dp-sec"><div class="dp-sec-lbl">Key projects</div>${projs}</div>` : ''}
+    ${(c.projects||[]).length ? `<div class="dp-sec"><div class="dp-sec-lbl">Key projects</div>${projs}</div>` : ''}
     ${collabs.length ? `<div class="dp-sec"><div class="dp-sec-lbl">Worked with</div><div class="dp-collabs">${escHtml(collabs.join(', '))}</div></div>` : ''}
     <div id="dp-news-${name.replace(/[^a-z0-9]/gi,'_')}"></div>
     <div class="dp-links">
