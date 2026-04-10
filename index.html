@@ -467,9 +467,7 @@
 <!-- INTRO STRIP -->
 <div class="intro-strip">
   <div class="intro-text">
-    <strong>The Developer Intelligence</strong> tracks UK regeneration opportunities at the earliest public stage —
-    before teams are appointed and before sites are optioned.
-    Built for architects, developers and placemakers who want to find work and land before the competition does.
+    <strong>The Developer Index</strong> is a directory of leading developers working in urban property on mixed-use and town centre sites.
   </div>
   <div class="intro-urgent" id="urgency-count" style="display:none">
     <div class="intro-urgent-dot"></div>
@@ -568,51 +566,7 @@
   </button>
 </div>
 
-<div class="filter-bar">
-  <div class="search-wrap">
-    <span class="search-icon">⌕</span>
-    <input type="text" class="search-input" id="search-input"
-      placeholder="Search location, authority, keyword…"
-      oninput="handleSearch()" autocomplete="off" spellcheck="false">
-    <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">Region</span>
-    <select class="filter-select" id="region-select" onchange="regionFilter=this.value;renderCurrentTab()">
-      <option value="all">All regions</option>
-    </select>
-  </div>
-  <div class="filter-group" id="profession-group">
-    <button class="chip active" data-cpvcat="all"       onclick="setCpvCat('all')">All</button>
-    <button class="chip"        data-cpvcat="arch"      onclick="setCpvCat('arch')">Architectural Services</button>
-    <button class="chip"        data-cpvcat="planning"  onclick="setCpvCat('planning')">Planning &amp; Urban Design</button>
-    <button class="chip"        data-cpvcat="engineer"  onclick="setCpvCat('engineer')">Engineering &amp; Surveying</button>
-    <button class="chip"        data-cpvcat="property"  onclick="setCpvCat('property')">Property &amp; Development</button>
-  </div>
-  <div class="filter-group" id="stage-group" style="display:none;">
-    <span class="filter-label">Stage</span>
-    <button class="chip active" data-stage="all"      onclick="setStage('all')">All stages</button>
-    <button class="chip"        data-stage="outline"  onclick="setStage('outline')">Outline</button>
-    <button class="chip"        data-stage="reserved" onclick="setStage('reserved')">Reserved Matters</button>
-    <button class="chip"        data-stage="full"     onclick="setStage('full')">Full Permission</button>
-    <button class="chip"        data-stage="prior"    onclick="setStage('prior')">Prior Approval</button>
-  </div>
-  <div class="filter-group" id="scale-group" style="display:none;">
-    <span class="filter-label">Scale</span>
-    <button class="chip active" data-scale="all"  onclick="setScale('all')">Any</button>
-    <button class="chip"        data-scale="50"   onclick="setScale('50')">50–199</button>
-    <button class="chip"        data-scale="200"  onclick="setScale('200')">200–499</button>
-    <button class="chip"        data-scale="500"  onclick="setScale('500')">500+</button>
-  </div>
-  <div class="filter-group" id="brownfield-status-group" style="display:none;">
-    <span class="filter-label">Permission</span>
-    <button class="chip active" data-bfstatus="all"              onclick="setBfStatus('all')">All sites</button>
-    <button class="chip"        data-bfstatus="not-permissioned" onclick="setBfStatus('not-permissioned')">No permission yet</button>
-    <button class="chip"        data-bfstatus="pending-decision" onclick="setBfStatus('pending-decision')">Decision pending</button>
-    <button class="chip"        data-bfstatus="permissioned"     onclick="setBfStatus('permissioned')">Permissioned</button>
-  </div>
-  <div class="results-meta" id="results-meta"></div>
-</div>
+
 
 <div class="loading-track"><div class="loading-fill"></div></div></div>
 </div>
@@ -907,8 +861,10 @@ function getItems(){
 }
 
 function handleSearch(){
-  searchTerm=document.getElementById('search-input').value.toLowerCase().trim();
-  document.getElementById('search-clear').classList.toggle('visible',searchTerm.length>0);
+  const si=document.getElementById('search-input');
+  if(!si)return;
+  searchTerm=si.value.toLowerCase().trim();
+  const sc1=document.getElementById('search-clear');if(sc1)sc1.classList.toggle('visible',searchTerm.length>0);
   renderCurrentTab();
 }
 function clearSearch(){
@@ -953,117 +909,11 @@ function renderCurrentTab(){
   renderProjects();
 }
 
-// RENDER PROCUREMENT
-function renderProcurement(items){
-  const el=document.getElementById('panel-procurement');
-  if(!items.length){el.innerHTML='<div class="empty-state">No procurement notices found.</div>';return;}
 
-  const CAT_LABELS={'arch':'Architectural','planning':'Planning & Urban','engineer':'Engineering','property':'Property & Development','other':'Other'};
-  const CAT_COLOURS={'arch':'#1a4e90','planning':'#1a6038','engineer':'#7a5c10','property':'#6a3090','other':'#666'};
 
-  // Sort: notices with deadline first (nearest first), then no-deadline at end
-  const sorted=[...items].sort((a,b)=>{
-    const da=daysUntil(a._deadlineRaw), db=daysUntil(b._deadlineRaw);
-    if(da===null&&db===null)return 0;
-    if(da===null)return 1;
-    if(db===null)return -1;
-    return da-db;
-  });
 
-  el.innerHTML=sorted.map(item=>{
-    const days=daysUntil(item._deadlineRaw);
-    const urgency=days===null?'none':days<=7?'urgent':days<=21?'soon':'ok';
-    const urgencyLabel=days===null?'No deadline':days===0?'Today':days===1?'1 day left':`${days} days`;
-    const cat=item.cpvCategory||'other';
-    const col=CAT_COLOURS[cat];
-    return`<div class="proc-card" onclick="window.open('${escAttr(item.url)}','_blank')">
-      <div class="proc-stripe" style="background:${col}"></div>
-      <div class="proc-body">
-        <div class="proc-eyebrow">
-          <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${col}">${CAT_LABELS[cat]||'Other'}</span>
-          ${item._stageLabel&&item._stageLabel!=='Tender'?`<span class="regen-pill" style="background:#1a4e9022;border-color:#1a4e90;color:#1a4e90;margin-left:0.5rem">${item._stageLabel}</span>`:''}
-        </div>
-        <div class="proc-title">${escHtml(item.title)}</div>
-        <div class="proc-org">${escHtml(item.org)}${item.location?' · '+escHtml(item.location):''}</div>
-        ${item.description?`<div class="proc-desc">${escHtml(item.description)}</div>`:''}
-        <div class="proc-tags">
-          ${item.value?`<span class="proc-tag">${escHtml(item.value)}</span>`:''}
-          ${item.region?`<span class="proc-tag">${escHtml(item.region)}</span>`:''}
-          ${item.published?`<span class="proc-tag">Published ${escHtml(item.published)}</span>`:''}
-        </div>
-      </div>
-      <div class="proc-deadline">
-        <div class="deadline-label">Deadline</div>
-        <div class="deadline-date">${escHtml(item.deadline||'TBC')}</div>
-        <span class="deadline-cd ${urgency}">${urgencyLabel}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
 
-// RENDER PIPELINE
-function renderPipeline(items){
-  const el=document.getElementById('panel-pipeline');
-  if(!items.length){el.innerHTML='<div class="empty-state">No planning applications match your filters.</div>';return;}
-  const order={outline:0,reserved:1,full:2,prior:3,unknown:4};
-  const sorted=[...items].sort((a,b)=>{
-    const s=(order[a._stage?.cls]??4)-(order[b._stage?.cls]??4);
-    return s!==0?s:(parseInt(b.units)||0)-(parseInt(a.units)||0);
-  });
-  el.innerHTML=sorted.map(item=>{
-    const u=item.units?parseInt(item.units):null;
-    const badge=u?(u>=200?`<span class="scale-badge xl">${u} homes</span>`:`<span class="scale-badge lg">${u} homes</span>`):'';
-    const sc=item._tab==='london'?'london':'';
-    const ec=item._tab==='london'?'london':'';
-    const lbl=item._tab==='london'?'London PLD':'Planning';
-    return`<div class="pipe-card" onclick="showDetail('${escAttr(String(item.id))}')">
-      <div class="pipe-stripe ${sc}"></div>
-      <div>
-        <div class="pipe-header">
-          <div class="pipe-eyebrow ${ec}">${lbl}</div>
-          ${item._stage?`<span class="pipe-stage ${item._stage.cls}">${item._stage.label}</span>`:''}
-        </div>
-        <div class="pipe-title">${escHtml((item.title||'').substring(0,130))}${(item.title||'').length>130?'…':''}</div>
-        <div class="pipe-org">${escHtml(item.org||'')}${item.location?' · '+escHtml(item.location):''}</div>
-        ${item.description&&item.description!==item.title?`<div class="pipe-desc">${escHtml(item.description.substring(0,200))}${item.description.length>200?'…':''}</div>`:''}
-        <div class="pipe-meta">
-          ${badge}
-          ${item.published?`<span class="pipe-meta-item">Submitted <strong>${escHtml(item.published)}</strong></span>`:''}
-          ${item.region?`<span class="pipe-meta-item">${escHtml(item.region)}</span>`:''}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
 
-// RENDER LAND
-function renderLand(items){
-  const el=document.getElementById('panel-land');
-  if(!items.length){el.innerHTML='<div class="empty-state">No brownfield sites match your filters.</div>';return;}
-  const sorted=[...items].sort((a,b)=>(parseInt(b.units)||0)-(parseInt(a.units)||0));
-  el.innerHTML=sorted.map(item=>{
-    const s=item.status||'';
-    const pc=s==='not-permissioned'?'no':s==='pending-decision'?'pending':'yes';
-    const pl=s==='not-permissioned'?'No Permission Yet':s==='pending-decision'?'Decision Pending':'Permissioned';
-    return`<div class="land-card" onclick="showDetail('${escAttr(String(item.id))}')">
-      <div class="land-stripe"></div>
-      <div>
-        <div class="land-header">
-          <div class="land-eyebrow">Brownfield Site</div>
-          <span class="land-perm ${pc}">${pl}</span>
-        </div>
-        <div class="land-address">${escHtml(item.location||item.title||'Brownfield site')}</div>
-        ${item.org?`<div class="land-lpa">${escHtml(item.org)}</div>`:''}
-        ${item.description?`<div class="land-notes">${escHtml(item.description.substring(0,200))}${item.description.length>200?'…':''}</div>`:''}
-        <div class="land-meta">
-          ${item.units?`<div class="land-stat"><div class="land-stat-num homes">${item.units}</div><div class="land-stat-label">min. homes</div></div>`:''}
-          ${item.hectares?`<div class="land-stat"><div class="land-stat-num ha">${item.hectares}ha</div><div class="land-stat-label">site area</div></div>`:''}
-          ${item.region?`<span class="pipe-meta-item">${escHtml(item.region)}</span>`:''}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
 
 // DETAIL
 function allItems(){return[...allProcurement,...allPipeline,...allLand];}
@@ -1291,6 +1141,7 @@ async function fetchBrownfield(){
 function populateRegions(){
   // Static list — never gets out of sync with data
   const sel=document.getElementById('region-select');
+  if(!sel)return;
   sel.innerHTML=`<option value="all">All regions</option>
     <option value="London">London</option>
     <option value="South East">South East</option>
@@ -1304,11 +1155,8 @@ function populateRegions(){
 
 // TAB COUNTS
 function updateCounts(){
-  // procurement and land tabs removed - only update directory and projects
-  const cd = document.getElementById('cnt-directory');
-  if(cd) cd.textContent = DIR_DATA.length;
-  const cp = document.getElementById('cnt-projects');
-  if(cp) cp.textContent = LIVE_PROJECTS.length;
+  // cnt-procurement removed
+  // cnt-land removed
 }
 
 
@@ -1427,8 +1275,8 @@ function getDirItems() {
     const q = searchTerm.toLowerCase();
     items = items.filter(c => {
       const hay = [c.name, c.description || '', ...(c.tags||[]),
-        ...(c.projects||[]).map(p => p.name + ' ' + p.location + ' ' + (p.description||'')),
-        ...(c.collaborators||[])].join(' ').toLowerCase();
+        ...c.projects.map(p => p.name + ' ' + p.location + ' ' + (p.description||'')),
+        ...c.collaborators].join(' ').toLowerCase();
       return hay.includes(q);
     });
   }
@@ -1528,7 +1376,7 @@ function renderDirectory() {
       </div>
       ${c.region && c.region !== 'UK-wide' ? `<div class="dtile-region">${escHtml(c.region)}</div>` : ''}
       ${tags ? `<div class="dtile-tags">${tags}</div>` : ''}
-      <div class="dtile-footer">${(c.projects||[]).length} project${c.projects.length !== 1 ? 's' : ''} \u00b7 click to explore</div>
+      <div class="dtile-footer">${c.projects.length} project${c.projects.length !== 1 ? 's' : ''} \u00b7 click to explore</div>
     </div>`;
   }).join('');
 }
@@ -1572,7 +1420,7 @@ function openDirPanel(name) {
     </div>
     ${c.description ? `<div class="dp-desc">${escHtml(c.description)}</div>` : ''}
     ${(c.tags||[]).length ? `<div class="dp-tags">${(c.tags||[]).map(t=>`<span class="dp-tag">${escHtml(t)}</span>`).join('')}</div>` : ''}
-    ${(c.projects||[]).length ? `<div class="dp-sec"><div class="dp-sec-lbl">Key projects</div>${projs}</div>` : ''}
+    ${c.projects.length ? `<div class="dp-sec"><div class="dp-sec-lbl">Key projects</div>${projs}</div>` : ''}
     ${collabs.length ? `<div class="dp-sec"><div class="dp-sec-lbl">Worked with</div><div class="dp-collabs">${escHtml(collabs.join(', '))}</div></div>` : ''}
     <div id="dp-news-${name.replace(/[^a-z0-9]/gi,'_')}"></div>
     <div class="dp-links">
