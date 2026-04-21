@@ -433,9 +433,9 @@
   .stat-approved{background:#e2d9f3;color:#4a235a;}
 
   /* LIVE PROJECTS */
-  .lp-toolbar{padding:0.5rem 0 0.75rem;display:flex;flex-direction:column;gap:0.5rem;}
+  .lp-toolbar{padding:0.5rem 2rem 0.75rem;display:flex;flex-direction:column;gap:0.5rem;}
   .lp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:0.75rem;}
-  #lp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:0.75rem;}
+  #lp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:0.75rem;padding:0.5rem 2rem 2rem;}
   .lp-card{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:0.5rem;}
   .lp-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;}
   .lp-card-name{font-family:var(--serif);font-size:0.95rem;font-weight:400;color:var(--ink);line-height:1.3;}
@@ -473,43 +473,7 @@
     <div class="intro-urgent-dot"></div>
     <span id="urgency-text">Loading live opportunities…</span>
   </div>
-  <button class="tour-trigger" onclick="startTour()">How to use this ↗</button>
-</div>
-
-<!-- TOUR BACKDROP -->
-<div class="tour-backdrop" id="tour-backdrop" onclick="endTour()"></div>
-
-<!-- TOUR TOOLTIPS -->
-<div class="tour-tooltip" id="tour-tip-0">
-  <div class="tour-arrow up"></div>
-  <div class="tour-step-label">Step 1 of 4</div>
-  <h3>Find live briefs before they close</h3>
-  <p>The <strong>Procurement Notices</strong> tab shows councils and public bodies actively seeking architects, masterplanners and development partners. Notices are sorted by deadline — <strong>the most urgent at the top.</strong></p>
-  <div class="tour-footer">
-    <div class="tour-dots">
-      <div class="tour-dot active"></div><div class="tour-dot"></div><div class="tour-dot"></div><div class="tour-dot"></div>
-    </div>
-    <div class="tour-nav">
-      <button class="tour-btn tour-btn-skip" onclick="endTour()">Skip</button>
-      <button class="tour-btn tour-btn-next" onclick="nextStep(1)">Next →</button>
-    </div>
-  </div>
-</div>
-
-<div class="tour-tooltip" id="tour-tip-1">
-  <div class="tour-arrow up"></div>
-  <div class="tour-step-label">Step 2 of 4</div>
-  <h3>Track major applications by stage</h3>
-  <p>The <strong>Planning Pipeline</strong> tab surfaces large-scale applications — 50+ homes — across England. Outline permissions come first: <strong>a site with outline planning but no reserved matters means a developer needs an architect.</strong></p>
-  <div class="tour-footer">
-    <div class="tour-dots">
-      <div class="tour-dot"></div><div class="tour-dot active"></div><div class="tour-dot"></div><div class="tour-dot"></div>
-    </div>
-    <div class="tour-nav">
-      <button class="tour-btn tour-btn-skip" onclick="endTour()">Skip</button>
-      <button class="tour-btn tour-btn-next" onclick="nextStep(2)">Next →</button>
-    </div>
-  </div>
+  
 </div>
 
 <div class="tour-tooltip" id="tour-tip-2">
@@ -524,21 +488,6 @@
     <div class="tour-nav">
       <button class="tour-btn tour-btn-skip" onclick="endTour()">Skip</button>
       <button class="tour-btn tour-btn-next" onclick="nextStep(3)">Next →</button>
-    </div>
-  </div>
-</div>
-
-<div class="tour-tooltip" id="tour-tip-3">
-  <div class="tour-arrow up"></div>
-  <div class="tour-step-label">Step 4 of 4</div>
-  <h3>Search and filter by what matters to you</h3>
-  <p>Use the search bar to find opportunities by location, authority or keyword — try <strong>"masterplan"</strong>, <strong>"Southwark"</strong> or <strong>"outline"</strong>. Filter by region and scale. Click any result to see full details and zoom the map.</p>
-  <div class="tour-footer">
-    <div class="tour-dots">
-      <div class="tour-dot"></div><div class="tour-dot"></div><div class="tour-dot"></div><div class="tour-dot active"></div>
-    </div>
-    <div class="tour-nav">
-      <button class="tour-btn tour-btn-next" onclick="endTour()">Got it ✓</button>
     </div>
   </div>
 </div>
@@ -566,7 +515,51 @@
   </button>
 </div>
 
-
+<div class="filter-bar">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" class="search-input" id="search-input"
+      placeholder="Search location, authority, keyword…"
+      oninput="handleSearch()" autocomplete="off" spellcheck="false">
+    <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Region</span>
+    <select class="filter-select" id="region-select" onchange="regionFilter=this.value;renderCurrentTab()">
+      <option value="all">All regions</option>
+    </select>
+  </div>
+  <div class="filter-group" id="profession-group">
+    <button class="chip active" data-cpvcat="all"       onclick="setCpvCat('all')">All</button>
+    <button class="chip"        data-cpvcat="arch"      onclick="setCpvCat('arch')">Architectural Services</button>
+    <button class="chip"        data-cpvcat="planning"  onclick="setCpvCat('planning')">Planning &amp; Urban Design</button>
+    <button class="chip"        data-cpvcat="engineer"  onclick="setCpvCat('engineer')">Engineering &amp; Surveying</button>
+    <button class="chip"        data-cpvcat="property"  onclick="setCpvCat('property')">Property &amp; Development</button>
+  </div>
+  <div class="filter-group" id="stage-group" style="display:none;">
+    <span class="filter-label">Stage</span>
+    <button class="chip active" data-stage="all"      onclick="setStage('all')">All stages</button>
+    <button class="chip"        data-stage="outline"  onclick="setStage('outline')">Outline</button>
+    <button class="chip"        data-stage="reserved" onclick="setStage('reserved')">Reserved Matters</button>
+    <button class="chip"        data-stage="full"     onclick="setStage('full')">Full Permission</button>
+    <button class="chip"        data-stage="prior"    onclick="setStage('prior')">Prior Approval</button>
+  </div>
+  <div class="filter-group" id="scale-group" style="display:none;">
+    <span class="filter-label">Scale</span>
+    <button class="chip active" data-scale="all"  onclick="setScale('all')">Any</button>
+    <button class="chip"        data-scale="50"   onclick="setScale('50')">50–199</button>
+    <button class="chip"        data-scale="200"  onclick="setScale('200')">200–499</button>
+    <button class="chip"        data-scale="500"  onclick="setScale('500')">500+</button>
+  </div>
+  <div class="filter-group" id="brownfield-status-group" style="display:none;">
+    <span class="filter-label">Permission</span>
+    <button class="chip active" data-bfstatus="all"              onclick="setBfStatus('all')">All sites</button>
+    <button class="chip"        data-bfstatus="not-permissioned" onclick="setBfStatus('not-permissioned')">No permission yet</button>
+    <button class="chip"        data-bfstatus="pending-decision" onclick="setBfStatus('pending-decision')">Decision pending</button>
+    <button class="chip"        data-bfstatus="permissioned"     onclick="setBfStatus('permissioned')">Permissioned</button>
+  </div>
+  <div class="results-meta" id="results-meta"></div>
+</div>
 
 <div class="loading-track"><div class="loading-fill"></div></div></div>
 </div>
@@ -607,7 +600,14 @@
     </div>
     <div class="filter-group" style="flex-wrap:wrap">
       <span class="filter-label">Focus</span>
-      <button class="chip" data-tag="Affordable housing" onclick="toggleTag('Affordable housing')">Affordable housing</button><button class="chip" data-tag="Brownfield specialist" onclick="toggleTag('Brownfield specialist')">Brownfield specialist</button><button class="chip" data-tag="Build-to-rent" onclick="toggleTag('Build-to-rent')">Build-to-rent</button><button class="chip" data-tag="Commercial-led" onclick="toggleTag('Commercial-led')">Commercial-led</button><button class="chip" data-tag="Community-led" onclick="toggleTag('Community-led')">Community-led</button><button class="chip" data-tag="Estate regeneration" onclick="toggleTag('Estate regeneration')">Estate regeneration</button><button class="chip" data-tag="For sale" onclick="toggleTag('For sale')">For sale</button><button class="chip" data-tag="Heritage retrofit" onclick="toggleTag('Heritage retrofit')">Heritage retrofit</button><button class="chip" data-tag="Industrial & logistics" onclick="toggleTag('Industrial & logistics')">Industrial & logistics</button><button class="chip" data-tag="Large scheme" onclick="toggleTag('Large scheme')">Large scheme</button><button class="chip" data-tag="Life sciences" onclick="toggleTag('Life sciences')">Life sciences</button><button class="chip" data-tag="Major masterplan" onclick="toggleTag('Major masterplan')">Major masterplan</button><button class="chip" data-tag="Master developer" onclick="toggleTag('Master developer')">Master developer</button><button class="chip" data-tag="Mixed tenure" onclick="toggleTag('Mixed tenure')">Mixed tenure</button><button class="chip" data-tag="Mixed-use" onclick="toggleTag('Mixed-use')">Mixed-use</button><button class="chip" data-tag="Neighbourhood scale" onclick="toggleTag('Neighbourhood scale')">Neighbourhood scale</button><button class="chip" data-tag="Public-private partnership" onclick="toggleTag('Public-private partnership')">Public-private partnership</button><button class="chip" data-tag="Residential-led" onclick="toggleTag('Residential-led')">Residential-led</button><button class="chip" data-tag="Social impact" onclick="toggleTag('Social impact')">Social impact</button><button class="chip" data-tag="Student accommodation" onclick="toggleTag('Student accommodation')">Student accommodation</button><button class="chip" data-tag="Sustainability-led" onclick="toggleTag('Sustainability-led')">Sustainability-led</button><button class="chip" data-tag="Waterfront" onclick="toggleTag('Waterfront')">Waterfront</button>
+    <button class="chip" data-tag="Affordable housing" onclick="toggleTag('Affordable housing')">Affordable housing</button>
+    <button class="chip" data-tag="Build-to-rent" onclick="toggleTag('Build-to-rent')">Build-to-rent</button>
+    <button class="chip" data-tag="Commercial-led" onclick="toggleTag('Commercial-led')">Commercial-led</button>
+    <button class="chip" data-tag="Estate regeneration" onclick="toggleTag('Estate regeneration')">Estate regeneration</button>
+    <button class="chip" data-tag="Heritage retrofit" onclick="toggleTag('Heritage retrofit')">Heritage retrofit</button>
+    <button class="chip" data-tag="Industrial & logistics" onclick="toggleTag('Industrial & logistics')">Industrial & logistics</button>
+    <button class="chip" data-tag="Mixed-use" onclick="toggleTag('Mixed-use')">Mixed-use</button>
+    <button class="chip" data-tag="Student accommodation" onclick="toggleTag('Student accommodation')">Student accommodation</button>
     </div>
     <div class="dir-meta" id="dir-meta"></div>
   </div>
@@ -861,10 +861,8 @@ function getItems(){
 }
 
 function handleSearch(){
-  const si=document.getElementById('search-input');
-  if(!si)return;
-  searchTerm=si.value.toLowerCase().trim();
-  const sc1=document.getElementById('search-clear');if(sc1)sc1.classList.toggle('visible',searchTerm.length>0);
+  searchTerm=document.getElementById('search-input').value.toLowerCase().trim();
+  document.getElementById('search-clear').classList.toggle('visible',searchTerm.length>0);
   renderCurrentTab();
 }
 function clearSearch(){
@@ -909,11 +907,117 @@ function renderCurrentTab(){
   renderProjects();
 }
 
+// RENDER PROCUREMENT
+function renderProcurement(items){
+  const el=document.getElementById('panel-procurement');
+  if(!items.length){el.innerHTML='<div class="empty-state">No procurement notices found.</div>';return;}
 
+  const CAT_LABELS={'arch':'Architectural','planning':'Planning & Urban','engineer':'Engineering','property':'Property & Development','other':'Other'};
+  const CAT_COLOURS={'arch':'#1a4e90','planning':'#1a6038','engineer':'#7a5c10','property':'#6a3090','other':'#666'};
 
+  // Sort: notices with deadline first (nearest first), then no-deadline at end
+  const sorted=[...items].sort((a,b)=>{
+    const da=daysUntil(a._deadlineRaw), db=daysUntil(b._deadlineRaw);
+    if(da===null&&db===null)return 0;
+    if(da===null)return 1;
+    if(db===null)return -1;
+    return da-db;
+  });
 
+  el.innerHTML=sorted.map(item=>{
+    const days=daysUntil(item._deadlineRaw);
+    const urgency=days===null?'none':days<=7?'urgent':days<=21?'soon':'ok';
+    const urgencyLabel=days===null?'No deadline':days===0?'Today':days===1?'1 day left':`${days} days`;
+    const cat=item.cpvCategory||'other';
+    const col=CAT_COLOURS[cat];
+    return`<div class="proc-card" onclick="window.open('${escAttr(item.url)}','_blank')">
+      <div class="proc-stripe" style="background:${col}"></div>
+      <div class="proc-body">
+        <div class="proc-eyebrow">
+          <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${col}">${CAT_LABELS[cat]||'Other'}</span>
+          ${item._stageLabel&&item._stageLabel!=='Tender'?`<span class="regen-pill" style="background:#1a4e9022;border-color:#1a4e90;color:#1a4e90;margin-left:0.5rem">${item._stageLabel}</span>`:''}
+        </div>
+        <div class="proc-title">${escHtml(item.title)}</div>
+        <div class="proc-org">${escHtml(item.org)}${item.location?' · '+escHtml(item.location):''}</div>
+        ${item.description?`<div class="proc-desc">${escHtml(item.description)}</div>`:''}
+        <div class="proc-tags">
+          ${item.value?`<span class="proc-tag">${escHtml(item.value)}</span>`:''}
+          ${item.region?`<span class="proc-tag">${escHtml(item.region)}</span>`:''}
+          ${item.published?`<span class="proc-tag">Published ${escHtml(item.published)}</span>`:''}
+        </div>
+      </div>
+      <div class="proc-deadline">
+        <div class="deadline-label">Deadline</div>
+        <div class="deadline-date">${escHtml(item.deadline||'TBC')}</div>
+        <span class="deadline-cd ${urgency}">${urgencyLabel}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
 
+// RENDER PIPELINE
+function renderPipeline(items){
+  const el=document.getElementById('panel-pipeline');
+  if(!items.length){el.innerHTML='<div class="empty-state">No planning applications match your filters.</div>';return;}
+  const order={outline:0,reserved:1,full:2,prior:3,unknown:4};
+  const sorted=[...items].sort((a,b)=>{
+    const s=(order[a._stage?.cls]??4)-(order[b._stage?.cls]??4);
+    return s!==0?s:(parseInt(b.units)||0)-(parseInt(a.units)||0);
+  });
+  el.innerHTML=sorted.map(item=>{
+    const u=item.units?parseInt(item.units):null;
+    const badge=u?(u>=200?`<span class="scale-badge xl">${u} homes</span>`:`<span class="scale-badge lg">${u} homes</span>`):'';
+    const sc=item._tab==='london'?'london':'';
+    const ec=item._tab==='london'?'london':'';
+    const lbl=item._tab==='london'?'London PLD':'Planning';
+    return`<div class="pipe-card" onclick="showDetail('${escAttr(String(item.id))}')">
+      <div class="pipe-stripe ${sc}"></div>
+      <div>
+        <div class="pipe-header">
+          <div class="pipe-eyebrow ${ec}">${lbl}</div>
+          ${item._stage?`<span class="pipe-stage ${item._stage.cls}">${item._stage.label}</span>`:''}
+        </div>
+        <div class="pipe-title">${escHtml((item.title||'').substring(0,130))}${(item.title||'').length>130?'…':''}</div>
+        <div class="pipe-org">${escHtml(item.org||'')}${item.location?' · '+escHtml(item.location):''}</div>
+        ${item.description&&item.description!==item.title?`<div class="pipe-desc">${escHtml(item.description.substring(0,200))}${item.description.length>200?'…':''}</div>`:''}
+        <div class="pipe-meta">
+          ${badge}
+          ${item.published?`<span class="pipe-meta-item">Submitted <strong>${escHtml(item.published)}</strong></span>`:''}
+          ${item.region?`<span class="pipe-meta-item">${escHtml(item.region)}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
+// RENDER LAND
+function renderLand(items){
+  const el=document.getElementById('panel-land');
+  if(!items.length){el.innerHTML='<div class="empty-state">No brownfield sites match your filters.</div>';return;}
+  const sorted=[...items].sort((a,b)=>(parseInt(b.units)||0)-(parseInt(a.units)||0));
+  el.innerHTML=sorted.map(item=>{
+    const s=item.status||'';
+    const pc=s==='not-permissioned'?'no':s==='pending-decision'?'pending':'yes';
+    const pl=s==='not-permissioned'?'No Permission Yet':s==='pending-decision'?'Decision Pending':'Permissioned';
+    return`<div class="land-card" onclick="showDetail('${escAttr(String(item.id))}')">
+      <div class="land-stripe"></div>
+      <div>
+        <div class="land-header">
+          <div class="land-eyebrow">Brownfield Site</div>
+          <span class="land-perm ${pc}">${pl}</span>
+        </div>
+        <div class="land-address">${escHtml(item.location||item.title||'Brownfield site')}</div>
+        ${item.org?`<div class="land-lpa">${escHtml(item.org)}</div>`:''}
+        ${item.description?`<div class="land-notes">${escHtml(item.description.substring(0,200))}${item.description.length>200?'…':''}</div>`:''}
+        <div class="land-meta">
+          ${item.units?`<div class="land-stat"><div class="land-stat-num homes">${item.units}</div><div class="land-stat-label">min. homes</div></div>`:''}
+          ${item.hectares?`<div class="land-stat"><div class="land-stat-num ha">${item.hectares}ha</div><div class="land-stat-label">site area</div></div>`:''}
+          ${item.region?`<span class="pipe-meta-item">${escHtml(item.region)}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 // DETAIL
 function allItems(){return[...allProcurement,...allPipeline,...allLand];}
@@ -1141,7 +1245,6 @@ async function fetchBrownfield(){
 function populateRegions(){
   // Static list — never gets out of sync with data
   const sel=document.getElementById('region-select');
-  if(!sel)return;
   sel.innerHTML=`<option value="all">All regions</option>
     <option value="London">London</option>
     <option value="South East">South East</option>
@@ -1155,8 +1258,8 @@ function populateRegions(){
 
 // TAB COUNTS
 function updateCounts(){
-  // cnt-procurement removed
-  // cnt-land removed
+  document.getElementById('cnt-procurement').textContent=allProcurement.length||'0';
+  document.getElementById('cnt-land').textContent=allLand.length||'0';
 }
 
 
@@ -1461,7 +1564,7 @@ async function loadDirNews(name) {
         + '</div></div>'
       : '<div style="font-size:.75rem;color:var(--text-muted);padding:.4rem 0">No recent news found.</div>';
     el.dataset.loaded = '1';
-  } catch { el.innerHTML = ''; }
+  } catch(e) { el.innerHTML = '<div style="font-size:.75rem;color:var(--text-muted);padding:.4rem 0">News unavailable — check /api/news.js is deployed.</div>'; }
 }
 
 
